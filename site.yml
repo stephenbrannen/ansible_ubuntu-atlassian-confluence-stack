@@ -13,7 +13,7 @@
     os_confluence_group: confluence
     # Database user, password, name
     confluence_db_user: confluence
-    confluence_db_user_password: set-password-here
+    confluence_db_user_password: bbdjhtBXuTgemNop9dWBwkda
     confluence_db_name: confluence
     # Proxy/Tomcat configuration
     proxy_url: confluence.example.com
