@@ -1,0 +1,5 @@
+---
+- name: nginx | systemctl restart nginx
+  service:
+    name: nginx
+    state: restarted

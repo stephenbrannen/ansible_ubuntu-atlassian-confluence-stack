@@ -1,0 +1,33 @@
+---
+- name: Stop Confluence service if it exists
+  systemd:
+    name: confluence
+    state: stopped
+  ignore_errors: true
+
+- name: Update repositories and install pip for Python 3
+  apt:
+    name: python3-pip
+    state: present
+    update_cache: true
+
+# Installing ACL to fix issue with becoming postgres user https://docs.ansible.com/ansible/latest/user_guide/become.html#risks-of-becoming-an-unprivileged-user
+# Intalling fontconfig to fix issue with missing fonts. https://confluence.atlassian.com/confkb/confluence-server-6-13-or-later-fails-with-fontconfiguration-error-when-installing-on-linux-operating-systems-960167204.html
+- name: Update repositories and install acl
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: true
+  loop:
+    - acl
+    - fontconfig
+
+- name: Create Confluence group
+  group:
+    name: confluence
+    state: present
+- name: Create Confluence user
+  user:
+    name: confluence
+    group: confluence
+    state: present

@@ -1,0 +1,10 @@
+---
+# defaults file for postgres role
+# Backup restore related defaults
+tmp_dir: /tmp/ansible_pg_restore
+# To skip pg_restore use an empty string ex. file_name: ""
+# Example of file_name: confluence-dump.tar.gz
+# Supported compression formats for dump and restore include .bz2, .gz and .xz
+# Supported formats for dump and restore include .sql and .tar
+file_path: "{{ role_path }}/files"
+file_name: "{{ confluence_db_dump_filename }}"

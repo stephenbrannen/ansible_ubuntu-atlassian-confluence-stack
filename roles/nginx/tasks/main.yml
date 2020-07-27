@@ -1,0 +1,30 @@
+---
+- name: Install nginx
+  apt:
+    name: nginx
+    state: present
+    update_cache: true
+- name: Configure SSL if enabled
+  block:
+  - name: Create directory for nginx ssl config files
+    file:
+      path: /etc/nginx/ssl
+      state: directory
+
+  - name: Generate DH Parameters with a different size (2048 bits)
+    openssl_dhparam:
+      path: /etc/nginx/ssl/dhparam
+      size: 2048
+      state: present
+  when: secure is match("true")
+
+- name: Replace nginx conf with template
+  template:
+    src: "{{ role_path }}/templates/etc/nginx/sites-enabled/default.j2"
+    dest: /etc/nginx/sites-enabled/default
+
+- name: Restart nginx service
+  systemd:
+    name: nginx
+    state: restarted
+    daemon_reload: yes

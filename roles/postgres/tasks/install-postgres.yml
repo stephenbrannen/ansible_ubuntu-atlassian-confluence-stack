@@ -1,0 +1,38 @@
+---
+- name: Add the Postgres GPG key from URL
+  apt_key:
+    url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+    state: present
+
+- name: Add the Postgres repository to apt
+  apt_repository:
+    repo: "deb http://apt.postgresql.org/pub/repos/apt/ {{ ubuntu_codename }}-pgdg main"
+    state: present
+
+- name: Update repositories and install Postgres
+  apt:
+    name: "postgresql-{{ postgres_version }}"
+    state: present
+    update_cache: true
+
+- block:
+  - name: Install psycopg2 for postgres user
+    pip:
+      name: psycopg2-binary
+
+  - name: Create Confluence role in Postgres
+    postgresql_user:
+      name: "{{ confluence_db_user }}"
+      password: "{{ confluence_db_user_password }}"
+      role_attr_flags: CREATEDB,LOGIN
+      state: present
+    no_log: true
+
+  - name: Create Confluence database in Postgres
+    postgresql_db:
+      name: "{{ confluence_db_name }}"
+      encoding: UTF-8
+      state: present
+      owner: "{{ confluence_db_user }}"
+  become: true
+  become_user: postgres

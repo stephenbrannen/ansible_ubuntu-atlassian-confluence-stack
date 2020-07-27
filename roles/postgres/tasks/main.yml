@@ -1,0 +1,6 @@
+---
+- name: PostgreSQL | Installing PostgreSQL...
+  include: install-postgres.yml
+- name: PostgreSQL | Start database restoring...
+  when: file_name | length > 0
+  include: restore-postgres.yml

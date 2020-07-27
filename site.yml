@@ -1,0 +1,34 @@
+---
+- name: Install Confluence, AdoptOpenJDK, Postgres, and Nginx
+  hosts: confluence_server
+  # Use the following variables to customize Confluence installation/restore, avoid editing the defaults files in invidual roles
+  vars:
+    # Versions to be installed
+    ubuntu_codename: focal
+    jdk_version: 11
+    postgres_version: 10
+    confluence_ver: 7.6.2
+    # OS user for Confluence service
+    os_confluence_user: confluence
+    os_confluence_group: confluence
+    # Database user, password, name
+    confluence_db_user: confluence
+    confluence_db_user_password: set-password-here
+    confluence_db_name: confluence
+    # Proxy/Tomcat configuration
+    proxy_url: confluence.example.com
+    proxy_port: "80"
+    scheme: http
+    secure: "false"
+    context_path: ""
+    # Backup files
+    # If you are performing a clean install the following two variables need to be empty strings ""
+    # Ensure you put each file in its respsective files directory (db restore in postgres role, home directory backup in confluence role)
+    confluence_db_dump_filename: ""
+    confluence_home_backup_filename: ""
+  roles:
+    - common
+    - jdk
+    - postgres
+    - confluence
+    - nginx

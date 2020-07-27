@@ -1,0 +1,78 @@
+---
+- name: Retrieving status of Confluence install directory to see if it exists
+  stat:
+    path: "{{ install_dir }}"
+  register: p
+
+- name: Create backup of Confluence install directory if it exists and delete
+  block:
+    - name: Create backup directory
+      file:
+        path: "{{ atl_dir }}/backups"
+        state: directory
+        owner: "{{ os_confluence_user }}"
+        group: "{{ os_confluence_group }}"
+    - name: Create backup for Confluence install
+      archive:
+        path: "{{ install_dir }}"
+        dest: "{{ atl_dir }}/backups/confluence_install_{{ ansible_date_time.iso8601 }}.tar.gz"
+    - name: Delete Confluence directory if it exists
+      file:
+        path: "{{ install_dir }}"
+        state: absent
+  when: p.stat.isdir is defined and p.stat.isdir
+
+- name: Create Atlassian install directory
+  file:
+    path: "{{ atl_dir }}"
+    state: directory
+    owner: "{{ os_confluence_user }}"
+    group: "{{ os_confluence_group }}"
+  when: p.state.isdir is not defined
+
+- name: Download Confluence install file
+  get_url:
+    url: "{{ download_url }}/atlassian-confluence-{{ confluence_ver }}.tar.gz"
+    dest: "{{ atl_dir }}"
+    owner: "{{ os_confluence_user }}"
+    group: "{{ os_confluence_group }}"
+
+- name: Unarchive install file
+  unarchive:
+    src: "{{ atl_dir }}/atlassian-confluence-{{ confluence_ver }}.tar.gz"
+    dest: "{{ atl_dir }}"
+    remote_src: true
+    owner: "{{ os_confluence_user }}"
+    group: "{{ os_confluence_group }}"
+
+- name: Rename un-archived directory to confluence
+  command: "mv {{ atl_dir }}/atlassian-confluence-{{ confluence_ver }} {{ install_dir }}"
+
+# synchrony-proxy remains owned by root for some reason
+- name: Chown Confluence directory to Confluence user
+  file:
+    path: "{{ install_dir }}"
+    owner: "{{ os_confluence_user }}"
+    group: "{{ os_confluence_group }}"
+    state: directory
+    recurse: true
+
+- name: Set Confluence home directory
+  lineinfile:
+    dest: "{{ install_dir }}/confluence/WEB-INF/classes/confluence-init.properties"
+    regexp: "^confluence.home={{ home_dir }}"
+    insertbefore: BOF
+    line: "confluence.home={{ home_dir }}"
+    state: present
+
+- name: Create Atlassian application-data directory
+  file:
+    path: "{{ home_dir }}"
+    state: directory
+    owner: "{{ os_confluence_user }}"
+    group: "{{ os_confluence_group }}"
+
+- name: Cleanup
+  file:
+    path: "{{ atl_dir }}/atlassian-confluence-{{ confluence_ver }}.tar.gz"
+    state: absent

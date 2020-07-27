@@ -1,0 +1,24 @@
+---
+- name: Adding proxy information to <confluence-install>/conf/server.xml
+  block:
+    # Install lxml Python module
+    - name: Install lxml Python module
+      pip:
+        name: lxml
+    # Example where parent XML nodes are created automatically
+    - name: Updating server.xml
+      xml:
+        path: "{{ install_dir }}/conf/server.xml"
+        xpath: "{{ item.xpath }}"
+        attribute: "{{ item.attribute }}"
+        value: "{{ item.value }}"
+      loop:
+        - { xpath: "/Server", attribute: "port", value: "{{ shutdown_port }}" }
+        - { xpath: "/Server/Service/Connector", attribute: "proxyName", value: "{{ proxy_url }}" }
+        - { xpath: "/Server/Service/Connector", attribute: "proxyPort", value: "{{ proxy_port }}" }
+        - { xpath: "/Server/Service/Connector", attribute: "scheme", value: "{{ scheme }}" }
+        - { xpath: "/Server/Service/Connector", attribute: "secure", value: "{{ secure }}" }
+        - { xpath: "/Server/Service/Engine/Host/Context[position() = 1]", attribute: "path", value: "{{ context_path }}"}
+  when: proxy_url | length > 0
+  become: true
+  become_user: "{{ os_confluence_user }}"

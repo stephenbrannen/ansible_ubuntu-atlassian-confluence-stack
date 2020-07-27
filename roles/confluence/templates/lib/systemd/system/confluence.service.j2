@@ -1,0 +1,14 @@
+[Unit]
+Description=Atlassian Confluence
+After=syslog.target network.target
+
+[Service]
+Type=forking
+User={{ os_confluence_user }}
+Group={{ os_confluence_group }}
+ExecStart={{ install_dir }}/bin/start-confluence.sh
+ExecStop={{ install_dir }}/bin/stop-confluence.sh
+PIDFile={{ install_dir }}/work/catalina.pid
+
+[Install]
+WantedBy=multi-user.target

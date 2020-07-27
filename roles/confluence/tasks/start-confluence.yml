@@ -1,0 +1,27 @@
+---
+- name: Create Confluence service
+  template:
+    src: "{{ role_path }}/templates/lib/systemd/system/confluence.service.j2"
+    dest: /lib/systemd/system/confluence.service
+    owner: root
+    group: root
+    mode: "0644"
+  register: result
+
+- name: systemctl daemon-reload
+  systemd:
+    daemon_reload: true
+  changed_when: false
+  when: result.changed
+
+- name: systemctl enable confluence
+  systemd:
+    name: confluence
+    enabled: yes
+    masked: no
+  when: result.changed
+
+- name: systemctl start confluence
+  systemd:
+    name: confluence
+    state: started

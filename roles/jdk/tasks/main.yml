@@ -1,0 +1,14 @@
+---
+- name: Add the AdoptOpenJDK GPG key from URL
+  apt_key:
+    url: https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public
+    state: present
+- name: Add the AdoptOpenJDK repository to apt
+  apt_repository:
+    repo: "deb https://adoptopenjdk.jfrog.io/adoptopenjdk/deb {{ ubuntu_codename }} main"
+    state: present
+- name: Update repositories and install AdoptOpenJDK
+  apt:
+    name: "adoptopenjdk-{{ jdk_version }}-hotspot"
+    state: present
+    update_cache: true

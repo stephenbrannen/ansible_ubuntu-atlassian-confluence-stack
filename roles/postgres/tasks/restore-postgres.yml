@@ -1,0 +1,43 @@
+---
+- name: Drop, recreate, and restore Confluence Database
+  block:
+    - name: Create temp directory
+      file:
+        path: "{{ tmp_dir }}"
+        state: directory
+        owner: "{{ os_confluence_user }}"
+        group: "{{ os_confluence_group }}"
+
+    - name: Transfer backup file to temp directory
+      copy:
+        src: "{{ file_path }}/{{ file_name }}"
+        dest: "{{ tmp_dir }}/{{ file_name }}"
+
+    - name: Install psycopg2 for confluence User
+      pip:
+        name: psycopg2-binary
+
+    - name: Drop and recreate Confluence database
+      postgresql_db:
+        name: "{{ confluence_db_name }}"
+        login_user: "{{ confluence_db_user }}"
+        encoding: UTF-8
+        owner: "{{ confluence_db_user }}"
+        state: "{{ item }}"
+      loop:
+        - absent
+        - present
+
+    - name: Restoring database dump
+      postgresql_db:
+        name: "{{ confluence_db_name }}"
+        login_user: "{{ confluence_db_user }}"
+        state: restore
+        target: "{{ tmp_dir }}/{{ file_name }}"
+
+    - name: Remove temp directory
+      file:
+        path: "{{ tmp_dir }}"
+        state: absent
+  become: true
+  become_user: "{{ os_confluence_user }}"

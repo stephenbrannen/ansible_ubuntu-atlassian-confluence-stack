@@ -1,0 +1,10 @@
+---
+download_url: https://www.atlassian.com/software/confluence/downloads/binary
+atl_dir: /opt/atlassian
+data_dir: /var/atlassian
+# Default shutdown port is 8000, can conflict with other applications
+shutdown_port: "8001"
+file_path: "{{ role_path }}/files/"
+file_name: "{{ confluence_home_backup_filename }}"
+install_dir: "{{ atl_dir }}/confluence"
+home_dir: "{{ data_dir }}/application-data/confluence"
