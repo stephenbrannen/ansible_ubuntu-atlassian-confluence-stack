@@ -4,7 +4,7 @@ Ansible playbook for installing Confluence, AdoptOpenJDK, Postgres, and NGINX in
 ## Quick Start
 * Clone the repo:
 ```
-git clone https://github.com/stephenbrannen/ansible_atlassian-confluence.git && cd ansible-playbooks
+git clone https://github.com/stephenbrannen/ansible_ubuntu-atlassian-confluence-stack.git && cd ansible-playbooks
 ```
 * Install ansible if needed; see [instructions](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
 * Edit site.yml to adjust variables as needed
