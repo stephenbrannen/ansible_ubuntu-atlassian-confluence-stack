@@ -65,12 +65,34 @@
     line: "confluence.home={{ home_dir }}"
     state: present
 
+- name: Retrieving status of Confluence home directory to see if it exists
+  stat:
+    path: "{{ home_dir }}"
+  register: p
+
+# Create a backup of home directory in the event this is used to upgrade Confluence
+- name: Create backup of Confluence home if it exists
+  block:
+    - name: Create backup directory
+      file:
+        path: "{{ data_dir }}/backups"
+        state: directory
+        owner: "{{ os_confluence_user }}"
+        group: "{{ os_confluence_group }}"
+
+    - name: Create backup
+      archive:
+        path: "{{ home_dir }}"
+        dest: "{{ data_dir }}/backups/confluence_home_{{ ansible_date_time.iso8601 }}.tar.gz"
+  when: p.stat.isdir is defined and p.stat.isdir
+
 - name: Create Atlassian application-data directory
   file:
     path: "{{ home_dir }}"
     state: directory
     owner: "{{ os_confluence_user }}"
     group: "{{ os_confluence_group }}"
+  when: p.stat.isdir is not defined
 
 - name: Cleanup
   file:
