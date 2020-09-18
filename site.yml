@@ -7,7 +7,7 @@
     ubuntu_codename: focal
     jdk_version: 11
     postgres_version: 10
-    confluence_ver: 7.6.2
+    confluence_ver: 7.7.3
     # OS user for Confluence service
     os_confluence_user: confluence
     os_confluence_group: confluence
